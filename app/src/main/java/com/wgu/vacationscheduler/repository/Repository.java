@@ -69,4 +69,12 @@ public class Repository {
     public interface Callback<T>{
         void onResult(T value);
     }
+
+    public void getVacationById(int vacationId, Callback<Vacation> callback) {
+        executor.execute(() -> {
+            Vacation vacation = vacationDao.getVacationByIdSync(vacationId);
+            callback.onResult(vacation);
+        });
+    }
+
 }

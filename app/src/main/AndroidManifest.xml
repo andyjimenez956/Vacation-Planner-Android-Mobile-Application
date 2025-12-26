@@ -11,6 +11,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.VacationScheduler">
+        <activity android:name=".ui.VacationListActivity"/>
+        <activity android:name=".ui.VacationDetailActivity" />
         <activity
             android:name=".MainActivity"
             android:exported="true">

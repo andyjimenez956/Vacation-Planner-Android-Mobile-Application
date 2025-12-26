@@ -28,4 +28,8 @@ public interface VacationDao{
 
     @Query("SELECT * FROM vacations WHERE id = :vacationId Limit 1")
     Vacation getVacationByIdSync(int vacationId);
+
+    @Query("SELECT COUNT(*) FROM excursions WHERE vacationId = :vacationId")
+    int countExcursionsForVacationSync(int vacationId);
+
 }
