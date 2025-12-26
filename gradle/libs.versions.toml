@@ -1,4 +1,6 @@
 [versions]
+room = "2.8.4"
+lifecycle = "2.10.0"
 agp = "8.13.2"
 junit = "4.13.2"
 junitVersion = "1.3.0"
@@ -9,6 +11,12 @@ activity = "1.12.2"
 constraintlayout = "2.2.1"
 
 [libraries]
+room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+
+lifecycle-livedata = { module = "androidx.lifecycle:lifecycle-livedata", version.ref = "lifecycle" }
+lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel", version.ref = "lifecycle" }
+
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
