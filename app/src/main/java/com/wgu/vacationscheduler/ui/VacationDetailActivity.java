@@ -5,6 +5,17 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
+
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -25,7 +36,7 @@ public class VacationDetailActivity extends AppCompatActivity {
     private final SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
 
     private EditText etTitle, etHotel, etStartDate, etEndDate;
-    private Button btnSave, btnDelete;
+    private Button btnSave, btnDelete, btnShare, btnViewExcursions;
 
     private Repository repo;
 
@@ -40,6 +51,18 @@ public class VacationDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_vacation_detail);
 
+        if (Build.VERSION.SDK_INT >= 33) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                    != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(
+                        this,
+                        new String[]{Manifest.permission.POST_NOTIFICATIONS},
+                        1001
+                );
+            }
+        }
+
+
         repo = new Repository(getApplication());
 
         etTitle = findViewById(R.id.etTitle);
@@ -48,6 +71,14 @@ public class VacationDetailActivity extends AppCompatActivity {
         etEndDate = findViewById(R.id.etEndDate);
         btnSave = findViewById(R.id.btnSave);
         btnDelete = findViewById(R.id.btnDelete);
+        btnShare = findViewById(R.id.btnShare);
+        btnViewExcursions = findViewById(R.id.btnViewExcursions);
+
+        btnShare.setOnClickListener(v -> shareVacation());
+
+        btnViewExcursions.setOnClickListener(v ->
+                Toast.makeText(this, "Excursions list coming next", Toast.LENGTH_SHORT).show()
+        );
 
         // Date pickers
         etStartDate.setOnClickListener(v -> showDatePicker(true));
@@ -162,8 +193,14 @@ public class VacationDetailActivity extends AppCompatActivity {
             // INSERT new
             Vacation v = new Vacation(title, hotel, startMillis, endMillis);
             repo.insertVacation(v);
+
+            //Added Notification Test
+            //scheduleAlert(startMillis, "Vacation Starting", title + " is starting today.");
+            //scheduleAlert(endMillis, "Vacation Ending", title + " is ending today.");
+
             Toast.makeText(this, "Vacation saved.", Toast.LENGTH_SHORT).show();
             finish();
+
         } else {
             // UPDATE existing
             if (currentVacation == null) {
@@ -177,6 +214,13 @@ public class VacationDetailActivity extends AppCompatActivity {
             currentVacation.setEndDate(endMillis);
 
             repo.updateVacation(currentVacation);
+
+            scheduleAlert(startMillis, "Vacation Starting", title + " is starting today.");
+            scheduleAlert(endMillis, "Vacation Ending", title + " is ending today.");
+
+            long testTime = System.currentTimeMillis() + 5000; // 5 seconds
+            scheduleAlert(testTime, "Vacation Alert Test", title + " notification test");
+
             Toast.makeText(this, "Vacation updated.", Toast.LENGTH_SHORT).show();
             finish();
         }
@@ -198,5 +242,38 @@ public class VacationDetailActivity extends AppCompatActivity {
                 finish();
             }
         }));
+    }
+
+    private void shareVacation(){
+        String message =
+                "Vacation Details\n" +
+                "Title: " + etTitle.getText().toString().trim() + "\n" +
+                "Hotel: " + etHotel.getText().toString().trim() + "\n" +
+                "Start Date: " + etStartDate.getText().toString().trim() + "\n" +
+                "End Date: " + etEndDate.getText().toString().trim();
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_TEXT, message);
+
+        startActivity(Intent.createChooser(intent, "Share Vacation"));
+
+    }
+
+    private void scheduleAlert(long triggerTime, String title, String message) {
+        Intent intent = new Intent(this, AlertReceiver.class);
+        intent.putExtra("title", title);
+        intent.putExtra("message", message);
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                this,
+                (int) (triggerTime % Integer.MAX_VALUE),
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+        );
+
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        if (alarmManager != null) {
+            alarmManager.set(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent);
+        }
     }
 }
