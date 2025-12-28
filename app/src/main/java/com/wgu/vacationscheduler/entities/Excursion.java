@@ -28,10 +28,10 @@ public class Excursion {
     public Excursion() { }
 
     @Ignore
-    public Excursion(int vacationId, String title, long date) {
-        this.vacationId = vacationId;
+    public Excursion( String title, long date,int vacationId) {
         this.title = title;
         this.date = date;
+        this.vacationId = vacationId;
     }
 
     public int getId() { return id; }

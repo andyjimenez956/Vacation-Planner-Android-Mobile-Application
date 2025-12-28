@@ -70,10 +70,18 @@ public class Repository {
         void onResult(T value);
     }
 
+
     public void getVacationById(int vacationId, Callback<Vacation> callback) {
         executor.execute(() -> {
             Vacation vacation = vacationDao.getVacationByIdSync(vacationId);
             callback.onResult(vacation);
+        });
+    }
+
+    public void getExcursionById(int excursionId, Callback<Excursion> callback){
+        executor.execute(() -> {
+            Excursion excursion = excursionDao.getExcursionByIdSync(excursionId);
+            callback.onResult(excursion);
         });
     }
 

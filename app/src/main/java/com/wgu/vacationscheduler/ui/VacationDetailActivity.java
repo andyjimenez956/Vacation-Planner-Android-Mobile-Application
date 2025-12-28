@@ -76,18 +76,23 @@ public class VacationDetailActivity extends AppCompatActivity {
 
         btnShare.setOnClickListener(v -> shareVacation());
 
-        btnViewExcursions.setOnClickListener(v ->
-                Toast.makeText(this, "Excursions list coming next", Toast.LENGTH_SHORT).show()
-        );
-
-        // Date pickers
-        etStartDate.setOnClickListener(v -> showDatePicker(true));
-        etEndDate.setOnClickListener(v -> showDatePicker(false));
-
-        // Read id if editing
         if (getIntent() != null && getIntent().hasExtra(EXTRA_VACATION_ID)) {
             vacationId = getIntent().getIntExtra(EXTRA_VACATION_ID, -1);
         }
+        btnViewExcursions.setOnClickListener(v -> {
+            if (vacationId == -1) {
+                Toast.makeText(this, "Save the vacation first.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            Intent intent = new Intent(this, ExcursionListActivity.class);
+            intent.putExtra(ExcursionListActivity.EXTRA_VACATION_ID, vacationId);
+            startActivity(intent);
+        });
+
+
+        etStartDate.setOnClickListener(v -> showDatePicker(true));
+        etEndDate.setOnClickListener(v -> showDatePicker(false));
+
 
         if (vacationId == -1) {
             // New vacation
